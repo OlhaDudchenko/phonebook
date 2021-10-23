@@ -1,0 +1,11 @@
+@import-normalize;
+
+body {
+  margin: 0;
+  font-family: "Dancing Script", cursive;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
