@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { contactsOperations, contactsSelectors } from "redux/phonebook";
+import { useAddContactsMutation } from "../../redux/phonebook/contacts";
 import { v4 as uuidv4 } from "uuid";
 import { InputWrapper, Input, FormButton } from "./ContactForm.styled";
 
-export function ContactForm() {
-  const items = useSelector(contactsSelectors.getItems);
-  const dispatch = useDispatch();
+export function ContactForm({ contacts }) {
+  const [addContacts] = useAddContactsMutation();
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
 
@@ -31,11 +29,12 @@ export function ContactForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const newContact = { name, number };
-    const filteredContact = items.find((item) => item.name === newContact.name);
+    const filteredContact = contacts.find(
+      (item) => item.name === newContact.name
+    );
     filteredContact
       ? alert(`${newContact.name} is already in contacts`)
-      : dispatch(contactsOperations.addContacts(newContact));
-
+      : addContacts(newContact);
     reset();
   };
 

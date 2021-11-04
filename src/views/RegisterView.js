@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { authOperations } from "redux/authorization";
 import { Section } from "components/Section";
 import { Input, FormButton } from "components/ContactForm/ContactForm.styled";
 import { Form } from "./RegisterView.styled";
+import { useRegisterMutation } from "../redux/authorization/auth";
+import { setCredentials } from "../redux/authorization/authSlice";
 
 export default function RegisterView() {
   const dispatch = useDispatch();
   const [user, setUser] = useState({ name: "", email: "", password: "" });
   const { name, email, password } = user;
+  const [register] = useRegisterMutation({ skip: user === "" });
 
   const handleChange = ({ target: { name, value } }) => {
     setUser((prev) => ({ ...prev, [name]: value }));
@@ -16,7 +18,13 @@ export default function RegisterView() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(authOperations.register({ name, email, password }));
+    (async () => {
+      const result = await register({ name, email, password });
+      if (result.data) {
+        dispatch(setCredentials(result.data));
+      }
+    })();
+
     setUser({ name: "", email: "", password: "" });
   };
 

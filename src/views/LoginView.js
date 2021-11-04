@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { authOperations } from "redux/authorization";
 import { Section } from "components/Section";
 import { Input, FormButton } from "components/ContactForm/ContactForm.styled";
 import { Form } from "./Login.styled";
+import { useLoginMutation } from "../redux/authorization/auth";
+import { setCredentials } from "../redux/authorization/authSlice";
 
 export default function LoginView() {
   const dispatch = useDispatch();
 
   const [user, setUser] = useState({ email: "", password: "" });
   const { email, password } = user;
+  const [login] = useLoginMutation();
 
   const handleChange = ({ target: { name, value } }) => {
     setUser((prev) => ({ ...prev, [name]: value }));
@@ -17,7 +19,12 @@ export default function LoginView() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(authOperations.login({ email, password }));
+    (async () => {
+      const result = await login({ email, password });
+      if (result) {
+        dispatch(setCredentials(result.data));
+      }
+    })();
     setUser({ email: "", password: "" });
   };
 

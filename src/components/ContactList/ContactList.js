@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { contactsOperations, contactsSelectors } from "redux/phonebook";
+import React from "react";
 import PropTypes from "prop-types";
 import Loader from "react-loader-spinner";
+import { useDeleteContactsMutation } from "../../redux/phonebook/contacts";
 import {
   List,
   ContactsListItem,
@@ -10,17 +9,12 @@ import {
   ContactsListName,
 } from "./ContactList.styled";
 
-export function ContactList() {
-  const items = useSelector(contactsSelectors.getVisibleContacts);
-  const loading = useSelector(contactsSelectors.getLoading);
-  const dispatch = useDispatch();
+export function ContactList({ contacts, isLoading }) {
+  const [deleteContacts] = useDeleteContactsMutation();
 
-  useEffect(() => {
-    dispatch(contactsOperations.fetchContacts());
-  }, [dispatch]);
   return (
     <>
-      {loading && (
+      {isLoading && (
         <Loader
           type="ThreeDots"
           color="rgb(255, 222, 173)"
@@ -28,19 +22,15 @@ export function ContactList() {
           width={80}
         />
       )}
-      {items.length > 0 ? (
+      {contacts.length > 0 ? (
         <List>
-          {items.map(({ id, name, number }) => {
+          {contacts.map(({ id, name, number }) => {
             return (
               <ContactsListItem key={id} id={id}>
                 <ContactsListName>
                   {name}: {number}
                 </ContactsListName>
-                <ContactsListButton
-                  onClick={() =>
-                    dispatch(contactsOperations.deleteContacts(id))
-                  }
-                >
+                <ContactsListButton onClick={() => deleteContacts(id)}>
                   Delete
                 </ContactsListButton>
               </ContactsListItem>

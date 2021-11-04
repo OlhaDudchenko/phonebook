@@ -1,4 +1,4 @@
-export const getLogged = (state) => state.authorization.isLoggedIn;
-export const getUserName = (state) => state.authorization.user.name;
-export const getIsRefreshing = (state) =>
-  state.authorization.isRefreshCurrentUser;
+export const getLogged = (state) => state.auth.isLoggedIn;
+export const getUserName = (state) => state.auth.user.name;
+export const token = (state) => state.auth.token;
+export const logout = (state) => state.auth.isLogout;

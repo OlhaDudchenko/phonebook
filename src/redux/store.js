@@ -1,7 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import logger from "redux-logger";
-import phonebookReducer from "./phonebook/contacts-reducer";
-import authorizationReducer from "./authorization/auth-reducer";
+import { setupListeners } from "@reduxjs/toolkit/query";
+import authReducer from "./authorization/authSlice";
+import { axiosBaseQuery } from "./authorization/auth";
+// import logger from "redux-logger";
+
 import {
   persistStore,
   persistReducer,
@@ -13,22 +15,28 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import { contactsApi } from "./phonebook/contacts";
+import { authorizationApi } from "./authorization/auth";
 
 const authPersistConfig = {
-  key: "authorization",
+  key: "auth",
   storage,
-  whitelist: ["token"],
+  whitelist: ["token", "user"],
 };
 
 const contactsPersistConfig = {
   key: "contacts",
   storage,
-  blacklist: ["filter"],
+  whitelist: ["queries", "mutations"],
 };
 export const store = configureStore({
   reducer: {
-    authorization: persistReducer(authPersistConfig, authorizationReducer),
-    contacts: persistReducer(contactsPersistConfig, phonebookReducer),
+    [contactsApi.reducerPath]: persistReducer(
+      contactsPersistConfig,
+      contactsApi.reducer
+    ),
+    [authorizationApi.reducerPath]: authorizationApi.reducer,
+    auth: persistReducer(authPersistConfig, authReducer),
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware({
@@ -36,9 +44,14 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-    logger,
+    // logger,
+    contactsApi.middleware,
+    authorizationApi.middleware,
   ],
   devTools: process.env.NODE_ENV === "development",
 });
+
+store.subscribe(axiosBaseQuery);
+setupListeners(store.dispatch);
 
 export const persistor = persistStore(store);

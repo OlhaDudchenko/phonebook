@@ -8,14 +8,12 @@ import { Header, HeaderWrapper } from "./SiteNav.styled";
 
 export function SiteNav() {
   const isLogged = useSelector(authSelectors.getLogged);
-  const isRefreshing = useSelector(authSelectors.getIsRefreshing);
   const location = useLocation();
 
   return (
     <Header pathname={location.pathname}>
       <HeaderWrapper>
         <Navigation />
-        {isLogged && isRefreshing && <UserMenu />}
         {isLogged ? <UserMenu /> : <AuthNav />}
       </HeaderWrapper>
     </Header>
