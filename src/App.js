@@ -35,7 +35,7 @@ function App() {
   const token = useSelector(authSelectors.token);
 
   const location = useLocation();
-  const { data, isFetching } = useFetchCurrentUserQuery({
+  const { data, isFetching } = useFetchCurrentUserQuery(token, {
     skip: token === null,
   });
 
